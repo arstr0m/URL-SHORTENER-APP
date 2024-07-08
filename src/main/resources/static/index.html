@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Short URL SpringBoot Edition</title>
+    <style>
+        body{
+            display: flex;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 10px auto;
+            background-color: #FAF9F6;
+            flex-direction: column;
+            justify-content: center;
+        }
+        h1{
+            text-align: center;
+            color: #2E8B57;
+            font-size: 3rem;
+
+        }
+        section{
+            margin: 1rem 0;
+            padding: 20px;
+            background-color: #FFFFFFF;
+            border: 1px solid #111111;
+            box-shadow: 10px 10px rgba(0, 0, 0, 0.5);
+        }
+        .container{
+            display: flex;
+            flex-direction: row;
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid #111111;
+            border-radius: 1px;
+        }
+        #original_url{
+            border: none;
+            text-align: center;
+            background-color: none;
+        }
+        button{
+            padding: 1rem;
+            flex: 1;
+            background-color: #2E8B57;
+        }
+        .result{
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 500px;
+            max-height: 200px;
+            justify-content: center;
+            align-items: center;
+        }
+        .views{
+            background-color:#2E8B57;
+            color: #FFFFFF;
+            font-size: 2rem;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Short URL Spring Edition</h1>
+</header>
+<main>
+    <section>
+        <h2>Paste the URL</h2>
+        <p>Short Url SpringBoot Edition allows you to shorten your favorite links, making it easier to be shared. No Ads</p>
+        <label for="original_url"></label>
+        <div class="container">
+            <input type="url" name="original_url" id="original_url" placeholder="your link goes here">
+            <button id="original_url_send" onclick="createUrl()">Shorten Url</button>
+        </div>
+        <div class="result" id="original_url_result"></div>
+
+    </section>
+    <section>
+        <h3>Simple and Fast URL Shortener</h3>
+        <p>ShortURL allows you to shorten long links from Instagram, Facebook, YouTube, Twitter, LinkedIn, WhatsApp, TikTok, blogs, and sites. Just paste the long URL and click the Shorten URL button. On the next page, copy the shortened URL and share it on sites, chat, and emails. After shortening the URL, check how many clicks it received.</p>
+        <h3>Shorten, Share, and Track</h3>
+        <p>Your shortened URLs can be used in publications, documents, advertisements, blogs, forums, instant messages, and other locations. Track statistics for your business and projects by monitoring the number of hits from your URL with our click counter.</p>
+    </section>
+    <section>
+        <h2>Check my views</h2>
+        <p>Short Url allow you to summarize the views on your url</p>
+        <label for="shorten_url"></label>
+        <div class="container">
+        <input type="url" name="shorten_url" id="shorten_url" placeholder="your link goes here">
+        <button id="search_shorten_url" onclick="searchViews()">Search views</button>
+        </div>
+        <div class="result" id="search_views_result"></div>
+    </section>
+
+    <script>
+        function isValidURL(string) {
+             const regex = /^(https?:\/\/)?((([a-zA-Z\d]([a-zA-Z\d-]*[a-zA-Z\d])*)\.)+[a-zA-Z]{2,}|((\d{1,3}\.){3}\d{1,3})|(\[?[a-fA-F\d:]+\]?)|localhost)(:\d+)?(\/[^\s]*)?$/i;
+             return regex.test(string);
+         }
+
+
+         function createUrl(){
+             var text = document.getElementById('original_url').value
+             const result = document.getElementById('original_url_result')
+             const url = 'u/?originalUrl='
+             if(!text){
+                 result.innerText = 'Url must not be empty!'
+                 return
+             }
+             if(!isValidURL(text)){
+                  result.innerText = 'Url must be valid!'
+                 return
+             }
+             fetch(url+text, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json'
+                 }
+             })
+             .then(response =>  response.text()
+             )
+             .then(data => {
+                 result.innerText = 'Url created  \n' + data
+
+             })
+             .catch(error => {
+                 result.innerText = 'Error: ' + error
+             });
+         }
+
+         function searchViews(){
+            var text = document.getElementById('shorten_url').value;
+            const result = document.getElementById('search_views_result');
+            let parts;
+
+            if (!text) {
+                result.innerText = 'Url must not be empty!';
+                return;
+            }
+
+            if (!isValidURL(text)) {
+                result.innerText = 'Url must be valid!';
+                return;
+            }
+            if (text.includes('/u/')) {
+                parts = text.split('/u/');
+                if (parts.length > 1) {
+                    var modifiedUrl = parts[0] + '/u/v/' + parts[1];
+                } else {
+                    result.innerText = 'URL format is incorrect!';
+                    return;
+                }
+            }
+
+            fetch(modifiedUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                const newParagraph = document.createElement('p');
+                newParagraph.innerText = data;
+                newParagraph.classList.add('views');
+                result.innerHTML = 'Your views are  ';
+                result.appendChild(newParagraph);
+            })
+            .catch(error => {
+                result.innerText = 'Error: ' + error;
+            });
+        }
+
+    </script>
+</main>
+</body>
+</html>
